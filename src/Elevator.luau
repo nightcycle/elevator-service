@@ -38,6 +38,7 @@ export type Elevator = {
 	_IsActive: boolean,
 	_OnExitFloorInvoke: OnFloorInvoke,
 	_OnArriveFloorInvoke: OnFloorInvoke,
+	_OnDestroying: Signal,
 	Queue: {[number]: string},
 	BoardingDuration: number,
 	DoorDuration: number,
@@ -67,6 +68,7 @@ Elevator.__index = Elevator
 function Elevator:Destroy()
 	if not self._IsAlive then return end
 	self._IsAlive = false
+	self._OnDestroying:Fire()
 	self._Maid:Destroy()
 	local t: any = self
 	for k, v in pairs(t) do
@@ -208,6 +210,8 @@ function Elevator:_GoTo(floorName: string): ()
 			local nextFloorName = self.Queue[1]
 			if nextFloorName then
 				self:_GoTo(nextFloorName)
+			elseif self:GetClosestFloor() ~= self._DefaultFloor then
+				self:_GoTo(self._DefaultFloor)
 			end
 		end
 	end))
@@ -223,6 +227,7 @@ function Elevator.new(car: Model, floors: {[number]: BasePart}): Elevator
 	self._Maid = Maid.new()
 	self.Car = car
 	self.OnCurrentFloorChanged = self._Maid:GiveTask(Signal.new())
+	self._OnDestroying = self._Maid:GiveTask(Signal.new())
 
 	KinematicObjectService:Insert(self.Car)
 

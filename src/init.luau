@@ -24,9 +24,11 @@ export type ElevatorService = {
 	__index: ElevatorService,
 	_Maid: Maid,
 	_IsAlive: boolean,
-	_Registry: {[Instance]: Elevator},
+	_Registry: {[Model]: Elevator},
 	SortFloorsByName: (self: ElevatorService, floors: {[number]: BasePart}) -> (),
 	RegisterElevator: (self: ElevatorService, car: Model, floors: {[number]: BasePart}) -> Elevator,
+	GetElevator: (self: ElevatorService, car: Model) -> Elevator,
+	RemoveElevator: (self: ElevatorService, car: Model) -> (),
 	Destroy: (self: ElevatorService) -> (),
 	new: () -> ElevatorService,
 	init: (maid: Maid) -> nil
@@ -53,10 +55,31 @@ end
 
 function ElevatorService:RegisterElevator(car: Model, floors: {[number]: BasePart}): Elevator
 	assert(RunService:IsServer())
+
+	local maid = self._Maid:GiveTask(Maid.new())
+
 	local elevator = self._Maid:GiveTask(Elevator.new(car, floors))
+
+	maid:GiveTask(elevator._OnDestroying:Connect(function()
+		self._Registry[car] = nil
+		maid:Destroy()
+	end))
+
 	self._Registry[car] = elevator
 	return elevator
 end
+
+function ElevatorService:GetElevator(car: Model): Elevator
+	assert(self._Registry[car], `no elevator registered for car {car:GetFullName()}`)
+	return self._Registry[car]
+end
+
+function ElevatorService:RemoveElevator(car: Model): ()
+	local elevator = self:GetElevator(car)
+	self._Registry[car] = nil
+	elevator:Destroy()
+end
+
 
 function ElevatorService:SortFloorsByName(floors: {[number]: BasePart})
 	local function getNumber(name: string): number?
