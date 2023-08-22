@@ -2,10 +2,15 @@
 name = "nightcycle/package"
 description = "A package!"
 version = "0.1.0"
-authors = ["CJ Oyer <coyer@nightcycle.us>"]
+authors = [ "CJ Oyer <coyer@nightcycle.us>",]
 realm = "shared"
 registry = "https://github.com/upliftgames/wally-index"
-exclude = ["Packages", ".vscode"]
+exclude = [ "Packages", ".vscode",]
 
 [dependencies]
-Maid = "nightcycle/maid@^1.1.4"
+Maid = "nightcycle/maid@1.1.4"
+NetworkUtil = "nightcycle/network-util@1.7.0"
+Spring = "nightcycle/spring@1.0.0"
+Signal = "nightcycle/signal@1.0.2"
+KinematicObjectService = "nightcycle/kinematic-object-service@0.1.2"
+ServiceProxy = "nightcycle/service-proxy@1.0.0"
