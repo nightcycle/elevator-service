@@ -17,7 +17,6 @@ local Signal = require(_Packages:WaitForChild("Signal"))
 local TARGET_MAID_SUFFIX = "_TARGET"
 local DEFAULT_DAMPING_RATIO = 1
 local DEFAULT_FREQUENCY = 0.25
-local SMALL = 0.001
 -- Variables
 -- References
 -- Private Functions
@@ -183,7 +182,7 @@ function Elevator:_GoTo(floorName: string): ()
 		self.Spring:Step(deltaTime)
 		self.Car:PivotTo(startCFrame:Lerp(goalCFrame, alpha))
 
-		if math.abs(self.Spring.Velocity) < SMALL and (goalCFrame.Position - primaryPart:GetPivot().Position).Magnitude < SMALL then
+		if math.abs(self.Spring.Velocity) < 0.005 and (goalCFrame.Position - primaryPart:GetPivot().Position).Magnitude < 0.01 then
 			if self.ArrivalChime then
 				self.ArrivalChime:Play()
 			end
